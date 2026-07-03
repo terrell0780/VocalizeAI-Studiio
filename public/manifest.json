@@ -1,0 +1,45 @@
+{
+  "short_name": "VocalizeAI",
+  "name": "VocalizeAI Studio — Deepgram Alternative & Voice AI Ecosystem",
+  "description": "Full-stack voice AI developer platform, Deepgram clone REST/WebSocket API, Silero VAD, faster-whisper, and Pipecat voice agents.",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z'/><path d='M19 10v2a7 7 0 0 1-14 0v-2'/><line x1='12' x2='12' y1='19' y2='22'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z'/><path d='M19 10v2a7 7 0 0 1-14 0v-2'/><line x1='12' x2='12' y1='19' y2='22'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#020617",
+  "theme_color": "#06b6d4",
+  "display": "standalone",
+  "orientation": "any",
+  "categories": ["developer", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Live Streaming ASR Studio",
+      "short_name": "Stream ASR",
+      "description": "Test real-time WebSocket streaming with Silero VAD",
+      "url": "/?tab=streaming"
+    },
+    {
+      "name": "Deepgram Batch Clone",
+      "short_name": "Batch ASR",
+      "description": "Test multi-speaker diarization and word timestamps",
+      "url": "/?tab=batch"
+    },
+    {
+      "name": "Voice Agent Pipeline",
+      "short_name": "Voice Agents",
+      "description": "Launch full-duplex Pipecat conversational agents",
+      "url": "/?tab=agents"
+    }
+  ]
+}
