@@ -9,11 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^9.9.0",
+    "@supabase/supabase-js": "^2.109.0",
+    "@tanstack/react-query": "^5.101.2",
     "clsx": "2.1.1",
-    "lucide-react": "^1.23.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "tailwind-merge": "3.4.0"
+    "react-router-dom": "^7.18.1",
+    "stripe": "^22.3.0",
+    "tailwind-merge": "3.4.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.17",
