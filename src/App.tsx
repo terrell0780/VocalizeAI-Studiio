@@ -7,6 +7,8 @@ import { apiFetch } from "./lib/api";
 import { hasApiBaseUrl, hasStripeKey } from "./lib/config";
 import { stripePromise } from "./lib/stripe";
 
+const ADMIN_PIN = "195151";
+
 type FAQ = { question: string; answer: string };
 type AuthMode = "login" | "signup" | "forgot";
 
@@ -112,6 +114,12 @@ const emailJourneys = [
 function AppShell() {
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [adminPin, setAdminPin] = useState("");
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const [adminPinError, setAdminPinError] = useState(false);
+  const [newPin, setNewPin] = useState("");
+  const [pinChanged, setPinChanged] = useState(false);
 
   useEffect(() => {
     if (!supabase) {
@@ -132,12 +140,32 @@ function AppShell() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const handleAdminLogin = () => {
+    if (adminPin === ADMIN_PIN) {
+      setAdminUnlocked(true);
+      setAdminPinError(false);
+      setAdminPin("");
+    } else {
+      setAdminPinError(true);
+      setTimeout(() => setAdminPinError(false), 2000);
+    }
+  };
+
+  const handlePinChange = () => {
+    if (newPin.length === 6 && /^\d{6}$/.test(newPin)) {
+      (window as any).__ADMIN_PIN = newPin;
+      setPinChanged(true);
+      setNewPin("");
+      setTimeout(() => setPinChanged(false), 2000);
+    }
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <div className="min-h-screen bg-slate-950 text-slate-100">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.16),_transparent_30%),radial-gradient(circle_at_80%_20%,_rgba(59,130,246,0.18),_transparent_24%),linear-gradient(180deg,_#020617,_#0f172a_55%,_#020617)]" />
-          <SiteHeader session={session} />
+          <SiteHeader session={session} setShowAdmin={setShowAdmin} />
           <Routes>
             <Route path="/" element={<HomePage session={session} />} />
             <Route path="/platform" element={<PlatformPage />} />
@@ -152,12 +180,75 @@ function AppShell() {
           </Routes>
           <SiteFooter />
         </div>
+
+        {showAdmin && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => { if (adminUnlocked) { setShowAdmin(false); setAdminUnlocked(false); } }}>
+            <div onClick={e => e.stopPropagation()} className="w-full max-w-lg mx-4 rounded-2xl border border-white/10 bg-slate-950 p-8 shadow-2xl">
+              {!adminUnlocked ? (
+                <>
+                  <div className="flex items-center gap-3 mb-6">
+                    <span className="text-2xl">🔒</span>
+                    <h2 className="text-xl font-semibold text-white">Admin Access</h2>
+                  </div>
+                  <p className="text-sm text-slate-400 mb-4">Enter 6-digit admin PIN</p>
+                  <div className="flex gap-2 mb-4">
+                    {[0,1,2,3,4,5].map(i => (
+                      <div key={i} className={`w-10 h-12 rounded-lg border flex items-center justify-center text-lg font-mono text-white transition-colors ${adminPin.length > i ? 'border-emerald-500 bg-emerald-500/10' : adminPinError ? 'border-red-500 bg-red-500/10' : 'border-white/10 bg-white/5'}`}>
+                        {adminPin[i] || ''}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {[1,2,3,4,5,6,7,8,9].map(n => (
+                      <button key={n} onClick={() => { if (adminPin.length < 6) { setAdminPin(p => p + n); } }} className="h-12 rounded-xl border border-white/10 bg-white/5 text-white text-lg font-semibold hover:bg-white/10 transition-colors">{n}</button>
+                    ))}
+                    <button onClick={() => setAdminPin('')} className="h-12 rounded-xl border border-white/10 bg-white/5 text-red-400 text-sm font-semibold hover:bg-white/10 transition-colors">Clear</button>
+                    <button onClick={() => { if (adminPin.length < 6) { setAdminPin(p => p + '0'); } }} className="h-12 rounded-xl border border-white/10 bg-white/5 text-white text-lg font-semibold hover:bg-white/10 transition-colors">0</button>
+                    <button onClick={() => setAdminPin(p => p.slice(0, -1))} className="h-12 rounded-xl border border-white/10 bg-white/5 text-slate-400 text-sm font-semibold hover:bg-white/10 transition-colors">⌫</button>
+                  </div>
+                  <button onClick={handleAdminLogin} disabled={adminPin.length !== 6} className="w-full h-11 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 disabled:opacity-40 transition-colors">Unlock</button>
+                  <button onClick={() => { setShowAdmin(false); setAdminPin(''); }} className="w-full mt-2 h-10 rounded-xl border border-white/10 text-slate-400 text-sm hover:text-white hover:bg-white/5 transition-colors">Cancel</button>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3 mb-6">
+                    <span className="text-2xl">🔒</span>
+                    <h2 className="text-xl font-semibold text-white">Admin Panel</h2>
+                  </div>
+                  <div className="space-y-3 mb-6">
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                      <p className="text-xs text-slate-500 mb-1">System</p>
+                      <p className="text-sm text-white">VocalizeAI Studio</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                      <p className="text-xs text-slate-500 mb-1">Auth</p>
+                      <p className="text-sm text-emerald-400">{session ? session.user.email : 'Not signed in'}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                      <p className="text-xs text-slate-500 mb-1">API Status</p>
+                      <p className="text-sm text-white">{hasApiBaseUrl ? 'Configured' : 'Not configured'}</p>
+                    </div>
+                  </div>
+                  <div className="border-t border-white/10 pt-4 mb-4">
+                    <p className="text-sm text-slate-400 mb-3">Change Admin PIN</p>
+                    <div className="flex gap-2">
+                      <input type="password" maxLength={6} value={newPin} onChange={e => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="New 6-digit PIN" className="flex-1 h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white outline-none focus:border-emerald-500/50" />
+                      <button onClick={handlePinChange} disabled={newPin.length !== 6} className="h-10 px-4 rounded-xl bg-emerald-500 text-black text-sm font-semibold hover:bg-emerald-400 disabled:opacity-40 transition-colors">Set</button>
+                    </div>
+                    {pinChanged && <p className="text-xs text-emerald-400 mt-2">PIN updated for this session</p>}
+                  </div>
+                  <button onClick={() => { setShowAdmin(false); setAdminUnlocked(false); }} className="w-full h-10 rounded-xl border border-white/10 text-slate-400 text-sm hover:text-white hover:bg-white/5 transition-colors">Close</button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </BrowserRouter>
     </QueryClientProvider>
   );
 }
 
-function SiteHeader({ session }: { session: Session | null }) {
+function SiteHeader({ session, setShowAdmin }: { session: Session | null; setShowAdmin: (v: boolean) => void }) {
   return (
     <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 sm:px-8 lg:px-10">
@@ -182,6 +273,7 @@ function SiteHeader({ session }: { session: Session | null }) {
         </nav>
 
         <div className="flex items-center gap-3">
+          <button onClick={() => setShowAdmin(true)} className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" title="Admin">🔒</button>
           <Link to="/auth" className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:bg-white/10">
             {session ? "Account" : "Sign in"}
           </Link>
