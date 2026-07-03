@@ -1,4 +1,21 @@
-.sass-cache/
-*.css.map
-*.sass.map
-*.scss.map
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vite
+*.tsbuildinfo
