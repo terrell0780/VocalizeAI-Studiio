@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { BrowserRouter, Link, NavLink, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider, useMutation, useQuery } from "@tanstack/react-query";
 import type { Session } from "@supabase/supabase-js";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { hasSupabaseEnv, supabase } from "./lib/supabase";
 import { apiFetch } from "./lib/api";
 import { hasApiBaseUrl, hasStripeKey } from "./lib/config";
@@ -152,6 +153,7 @@ function AppShell() {
           </Routes>
           <SiteFooter />
         </div>
+        <SpeedInsights />
       </BrowserRouter>
     </QueryClientProvider>
   );
